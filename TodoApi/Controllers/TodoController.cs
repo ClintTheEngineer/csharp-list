@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TodoApi.Controllers
 {
@@ -19,6 +20,45 @@ namespace TodoApi.Controllers
         {
             return Ok(Todos);
         }
+
+        [HttpPost]
+        public ActionResult<Todo> CreateTodo([FromBody]Todo todo)
+        {
+          todo.Id = Todos.Count + 1;
+          Todos.Add(todo);
+          return CreatedAtAction(nameof(GetTodos), new { id = todo.Id }, todo);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateTodo(int id, [FromBody] Todo todo)
+        {
+          var existingTodo = Todos.FirstOrDefault(t => t.Id == id);
+
+           if (existingTodo == null)
+        {
+            return NotFound();
+        }
+
+           existingTodo.Text = todo.Text;
+
+            return NoContent();
+        }
+       
+       [HttpDelete("{id}")]
+        public IActionResult DeleteTodo(int id)
+        {
+         var todo = Todos.FirstOrDefault(t => t.Id == id);
+
+         if (todo == null)
+         {
+         return NotFound();
+         }
+
+          Todos.Remove(todo);
+
+         return NoContent();
+        }
+
     }
 }
 
